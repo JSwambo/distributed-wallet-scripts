@@ -1,0 +1,11 @@
+[package]
+name = "init"
+version = "0.1.0"
+authors = ["JSwambo <jake.t.swambo@hotmail.co.uk>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+noiseexplorer_kk = { path = "../Noise_KK" }
+rand = "0.7.3"

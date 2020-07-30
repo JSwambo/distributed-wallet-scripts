@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "init",
+    "noise_client",
+    "noise_server",
+    "Noise_KK"
+]
