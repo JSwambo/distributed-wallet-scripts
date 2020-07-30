@@ -382,6 +382,7 @@ dependencies = [
  "noiseexplorer_kk",
  "rand 0.7.3",
  "tokio",
+ "utils",
 ]
 
 [[package]]
@@ -392,6 +393,7 @@ dependencies = [
  "noiseexplorer_kk",
  "rand 0.7.3",
  "tokio",
+ "utils",
 ]
 
 [[package]]
@@ -778,6 +780,13 @@ name = "unicode-xid"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
+
+[[package]]
+name = "utils"
+version = "0.1.0"
+dependencies = [
+ "noiseexplorer_kk",
+]
 
 [[package]]
 name = "wasi"
