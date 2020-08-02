@@ -5,7 +5,7 @@ use noiseexplorer_kk::consts::*;
 use tokio::net::TcpStream;
 use tokio::prelude::*;
 
-use utils::{Array, load_static_keypair, load_remote_pubkey};
+use utils::{print_msg, load_static_keypair, load_remote_pubkey, handle_hs_read, HS_MSG_LEN};
 
 #[tokio::main]
 async fn main() {
@@ -13,25 +13,30 @@ async fn main() {
     println!("created stream");
 
     let s = load_static_keypair("client").unwrap();
-
     let rs = load_remote_pubkey("server").unwrap();
-
     let mut session = NoiseSession::init_session(true, &[0u8], s, Some(rs));
 
+    // Handle Write
     let e_keypair = Keypair::default();
 
     let e = e_keypair.get_public_key().as_bytes();
-    let mut in_out = [0u8; 48];
+    let mut in_out = [0u8; HS_MSG_LEN];
     in_out[..DHLEN].copy_from_slice(&e);
-    println!("(before processing) in_out = {:?}", Array{ data: in_out });
 
-    session.send_message(&mut in_out); 
+    session.set_ephemeral_keypair(e_keypair);
+    session.send_message(&mut in_out).unwrap(); //processes in_out
 
-    println!("(after processing) in_out = {:?}", Array{ data: in_out });
+    stream.write(&in_out).await.unwrap();
+    print_msg(&in_out, true);
 
-    let result = stream.write(&in_out).await;
-    println!("wrote to stream; success={:?}", result.is_ok());
+    // Handle Read
+    let (reader, mut _writer) = stream.split();
+
+    let mut msg_b = handle_hs_read(reader).await;
+    print_msg(&msg_b, false);
+    session.recv_message(&mut msg_b).unwrap();
 
     println!("message count = {:?}", session.get_message_count());
     println!("handshake hash = {:?}", session.get_handshake_hash());
+    println!("is transport? {:?}", session.is_transport());
 }

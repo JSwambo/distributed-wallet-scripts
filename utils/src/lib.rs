@@ -1,3 +1,6 @@
+use tokio::prelude::*;
+use tokio::net::{tcp::ReadHalf};
+
 use noiseexplorer_kk::types::{Keypair, PrivateKey, PublicKey};
 use noiseexplorer_kk::consts::*;
 
@@ -6,14 +9,26 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io;
 
+pub const HS_MSG_LEN: usize = 128;
+
 pub struct Array<T> {
-    pub data: [T; 48]
+    pub data: [T; HS_MSG_LEN]
 }
 
 impl<T: fmt::Debug> fmt::Debug for Array<T> {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         self.data[..].fmt(formatter)
     }
+}
+
+pub fn print_msg(msg: &[u8; HS_MSG_LEN], sent: bool) {
+    let mut printable_msg = [0u8; HS_MSG_LEN];
+    printable_msg.copy_from_slice(&msg[..]);
+    if let true = sent {
+        println!("Sent message: {:?}", Array{ data: printable_msg });        
+    } else {
+        println!("Received message: {:?}", Array{ data: printable_msg });     
+    };
 }
 
 pub fn load_static_keypair(entity: &str) -> Result<Keypair, io::Error> {
@@ -30,7 +45,6 @@ pub fn load_static_keypair(entity: &str) -> Result<Keypair, io::Error> {
         Ok(keypair) => Ok(keypair),
         Err(e) => panic!("Error generating static key pair {:?}", e),
     }
-
 }
 
 pub fn load_remote_pubkey(entity: &str) -> Result<PublicKey, io::Error> {
@@ -47,6 +61,12 @@ pub fn load_remote_pubkey(entity: &str) -> Result<PublicKey, io::Error> {
     }
 }
 
+
+pub async fn handle_hs_read(mut reader: ReadHalf<'_>) -> [u8; HS_MSG_LEN] {
+    let mut msg_buf = [0u8; HS_MSG_LEN];
+    reader.read(&mut msg_buf).await.unwrap();
+    msg_buf
+}
 
 #[cfg(test)]
 mod tests {
