@@ -14,8 +14,8 @@ async fn main() -> std::io::Result<()> {
     let rs = load_remote_pubkey("client").unwrap();
     let mut session = NoiseSession::init_session(false, &[0u8], s, Some(rs));
 
-    let mut listener = TcpListener::bind("127.0.0.1:6142").await.unwrap();
-    println!("Server running on localhost:6142");
+    let mut listener = TcpListener::bind("127.0.0.1:8000").await.unwrap();
+    println!("Server running on localhost:8000");
 
     match listener.accept().await {
         Ok((mut socket, addr)) => {
@@ -50,4 +50,7 @@ async fn main() -> std::io::Result<()> {
     println!("is transport? {:?}", session.is_transport());
 
     Ok(())
+
+    // Following this, set up a loop where the server awaits for messages from the client and responds accordingly.
 }
+

@@ -12,3 +12,4 @@ futures = "0.3"
 rand = "0.7.3"
 noiseexplorer_kk = { path = "../Noise_KK" }
 utils = { path = "../utils"}
+lazy_static = "1.2.0"

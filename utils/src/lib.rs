@@ -1,3 +1,9 @@
+use std::net::SocketAddr;
+use anyhow::Result;
+use tokio::net::{TcpStream};
+use tokio_socks::tcp::Socks5Stream;
+use tokio_socks::IntoTargetAddr;
+
 use tokio::prelude::*;
 use tokio::net::{tcp::ReadHalf};
 
@@ -10,6 +16,12 @@ use std::io::prelude::*;
 use std::io;
 
 pub const HS_MSG_LEN: usize = 128;
+
+
+pub async fn connect_tor_socks_proxy<'a>(proxy: SocketAddr, dest: impl IntoTargetAddr<'a>) -> Result<TcpStream> {
+    let sock = Socks5Stream::connect(proxy, dest).await?;
+    Ok(sock.into_inner())
+}
 
 pub struct Array<T> {
     pub data: [T; HS_MSG_LEN]
@@ -75,3 +87,4 @@ mod tests {
         assert_eq!(2 + 2, 4);
     }
 }
+
